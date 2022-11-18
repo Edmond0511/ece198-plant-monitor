@@ -83,7 +83,7 @@ int main(void)
   /* USER CODE BEGIN SysInit */
 
   /* USER CODE END SysInit */
-
+  int led_status = 1;
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
@@ -97,7 +97,18 @@ int main(void)
     lcd = Lcd_create(ports, pins, GPIOB, GPIO_PIN_5, GPIOB, GPIO_PIN_4, LCD_4_BIT_MODE);
     Lcd_cursor(&lcd, 0,0);
     Lcd_string(&lcd, "Status:");
-
+    HAL_GPIO_WritePin(GPIOA,GPIO_PIN_10, led_status);
+    if (HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_10) == 0){
+    	Lcd_cursor(&lcd, 0,7);
+    	Lcd_string(&lcd, "OFF");
+    	Lcd_cursor(&lcd,1,0);
+    	Lcd_string(&lcd,"Program Running");
+    }else {
+    	Lcd_cursor(&lcd, 0,7);
+    	Lcd_string(&lcd,"ON");
+    	Lcd_cursor(&lcd,1,0);
+    	Lcd_string(&lcd,"Program Running");
+    }
 
   /* USER CODE END 2 */
 
@@ -210,7 +221,7 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_10, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_7, GPIO_PIN_RESET);
@@ -224,8 +235,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PA5 PA6 PA7 */
-  GPIO_InitStruct.Pin = GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7;
+  /*Configure GPIO pins : PA5 PA6 PA7 PA10 */
+  GPIO_InitStruct.Pin = GPIO_PIN_5|GPIO_PIN_6|GPIO_PIN_7|GPIO_PIN_10;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
