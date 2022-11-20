@@ -94,7 +94,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   // Lcd_PortType ports[] = { D4_GPIO_Port, D5_GPIO_Port, D6_GPIO_Port, D7_GPIO_Port };
 
-  	int led_status = 0;
+  	int led_status = 1;
     Lcd_PortType ports[] = { GPIOC, GPIOB, GPIOA, GPIOA };
     // Lcd_PinType pins[] = {D4_Pin, D5_Pin, D6_Pin, D7_Pin};
     Lcd_PinType pins[] = {GPIO_PIN_7, GPIO_PIN_6, GPIO_PIN_7, GPIO_PIN_6};
@@ -131,25 +131,36 @@ int main(void)
 
 	  HAL_ADC_Start(&hadc1);
 	  Lcd_clear(&lcd);
-	  if (HAL_ADC_PollForConversion(&hadc1,100) == HAL_OK){
+	  if (HAL_ADC_PollForConversion(&hadc1,1000) == HAL_OK){
 		  analog_value = HAL_ADC_GetValue(&hadc1);
 		  Lcd_cursor(&lcd,0,0);
-		  Lcd_string(&lcd,"Lumens:");
-		  Lcd_cursor(&lcd,0,7);
-		  Lcd_int(&lcd,((analog_value/1024) * 0.25*90));
-		  Lcd_cursor(&lcd,1,0);
-		  Lcd_string(&lcd,"Soil Mosit:");
-		  int value = HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_8);
-		  if (value == 1){
-		  	Lcd_cursor(&lcd,1,12);
-		  	Lcd_string(&lcd,"WET");
-		  } else {
-		  	Lcd_cursor(&lcd,1,12);
-		  	Lcd_string(&lcd,"DRY");
+		  Lcd_string(&lcd,"Soil Moist:");
+		  if(analog_value/1000 <= 1){
+			  Lcd_string(&lcd,"Wet");
+		  } else if (  analog_value/1000 <= 2 ){
+			  Lcd_string(&lcd,"Moist");
+
+		  }else if (analog_value/1000 >= 3) {
+			  Lcd_string(&lcd,"Dry");
 		  }
 
-	  }
+		  Lcd_cursor(&lcd,1,0);
+		  Lcd_string(&lcd,"Lumens:");
+		  Lcd_int(&lcd,0);
+//		  int value = HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_1);
+		  //Lcd_int(&lcd,((analog_value/1024) *0.25*90));
 
+//		  Lcd_int(&lcd,((analog_value/1024) * 0.25*90));
+//		  int value = HAL_GPIO_ReadPin(GPIOA,GPIO_PIN_8);
+//		  if (value == 1){
+//		  	Lcd_cursor(&lcd,1,11);
+//		  	Lcd_string(&lcd,"WET");
+//		  } else {
+//		  	Lcd_cursor(&lcd,1,11);
+//		  	Lcd_string(&lcd,"DRY");
+//		  }
+
+	  }
 	  HAL_ADC_Stop(&hadc1);
 
 
@@ -335,12 +346,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PA8 */
-  GPIO_InitStruct.Pin = GPIO_PIN_8;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PB4 PB5 PB6 */
   GPIO_InitStruct.Pin = GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_6;
